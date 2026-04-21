@@ -1,0 +1,64 @@
+uv --cache-dir .\.uv-cache run python openai_loop_example.py                     pwsh   98  22:45:45 
+
+================ Cislo 1 ================
+
+[1] Posilam modelu prompt a dostupny tool:
+Rekni kratky vtip s cislem 1. Nejdriv pouzij tool square_number a ve vtipu pouzij vysledek.
+Tool: square_number
+
+[2] Model si vyzadal tool call:
+Tool call ID: call_7gCvD9KmwTyifkx6eyGwDel0
+Nazev toolu: square_number
+Argumenty od modelu: {"number":1}
+
+[3] Python spustil lokalni funkci:
+square_number(1) -> 1
+
+[4] Posilam vysledek toolu zpatky modelu:
+{'role': 'tool', 'tool_call_id': 'call_7gCvD9KmwTyifkx6eyGwDel0', 'content': '{"number": 1, "square": 1}'}
+
+[5] Finalni odpoved modelu:
+--- Vtip cislo 1: 1^2 = 1 ---
+Proč nemůže být číslo 1 nikdy bohaté? Protože vždy, když se zčtvercuje, zůstane stále 1!
+
+================ Cislo 2 ================
+
+[1] Posilam modelu prompt a dostupny tool:
+Rekni kratky vtip s cislem 2. Nejdriv pouzij tool square_number a ve vtipu pouzij vysledek.
+Tool: square_number
+
+[2] Model si vyzadal tool call:
+Tool call ID: call_zFO87fiTTN3yqTPXUEtVoG9l
+Nazev toolu: square_number
+Argumenty od modelu: {"number":2}
+
+[3] Python spustil lokalni funkci:
+square_number(2) -> 4
+
+[4] Posilam vysledek toolu zpatky modelu:
+{'role': 'tool', 'tool_call_id': 'call_zFO87fiTTN3yqTPXUEtVoG9l', 'content': '{"number": 2, "square": 4}'}
+
+[5] Finalni odpoved modelu:
+--- Vtip cislo 2: 2^2 = 4 ---
+Proč se dvojka necítí nejlépe ve škole? Protože její oblíbené číslo je vždycky čtyřka!
+
+================ Cislo 3 ================
+
+[1] Posilam modelu prompt a dostupny tool:
+Rekni kratky vtip s cislem 3. Nejdriv pouzij tool square_number a ve vtipu pouzij vysledek.
+Tool: square_number
+
+[2] Model si vyzadal tool call:
+Tool call ID: call_bvc5Dd16J6Wj57fgiREbrIB5
+Nazev toolu: square_number
+Argumenty od modelu: {"number":3}
+
+[3] Python spustil lokalni funkci:
+square_number(3) -> 9
+
+[4] Posilam vysledek toolu zpatky modelu:
+{'role': 'tool', 'tool_call_id': 'call_bvc5Dd16J6Wj57fgiREbrIB5', 'content': '{"number": 3, "square": 9}'}
+
+[5] Finalni odpoved modelu:
+--- Vtip cislo 3: 3^2 = 9 ---
+Proč se 3 nikdy nehádá se 4? Protože už zná její čtvercový plán – 9!
