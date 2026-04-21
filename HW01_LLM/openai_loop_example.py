@@ -3,6 +3,7 @@ Jednoducha ukazka LLM API s vlastnim toolem.
 
 Do souboru .env ve stejne slozce uloz:
     OPENAI_API_KEY=tvuj_api_klic
+    https://developers.openai.com/api/docs/quickstart
 
 Spusteni:
     uv --cache-dir .uv-cache run python openai_loop_example.py
