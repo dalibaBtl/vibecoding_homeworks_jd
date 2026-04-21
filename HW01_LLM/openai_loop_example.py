@@ -76,10 +76,7 @@ for number in range(1, 4):
         model="gpt-4o",
         messages=messages,
         tools=tools,
-        tool_choice={
-            "type": "function",
-            "function": {"name": "square_number"},
-        },
+        tool_choice="auto",
     )
 
     tool_call = response.choices[0].message.tool_calls[0]
