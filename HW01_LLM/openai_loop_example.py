@@ -7,9 +7,11 @@ Do souboru .env ve stejne slozce uloz:
 
 Spusteni:
     uv --cache-dir .uv-cache run python openai_loop_example.py
+
 """
 
 import json
+import math
 import os
 from pathlib import Path
 
@@ -30,14 +32,31 @@ tools = [
     {
         "type": "function",
         "function": {
-            "name": "square_number",
-            "description": "Vrati druhou mocninu zadaneho cisla.",
+            "name": "blackbox_funkce_1",
+            "description": "Tajná funkce 1.",
             "parameters": {
                 "type": "object",
                 "properties": {
                     "number": {
                         "type": "integer",
-                        "description": "Cislo, ktere se ma umocnit na druhou.",
+                        "description": "Vstup do tajné funkce 1.",
+                    },
+                },
+                "required": ["number"],
+            },
+        },
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "blackbox_funkce_2",
+            "description": "Tajná funkce 2.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "number": {
+                        "type": "integer",
+                        "description": "Vstup do tajné funkce 2.",
                     },
                 },
                 "required": ["number"],
@@ -46,9 +65,11 @@ tools = [
     }
 ]
 
-
-def square_number(number):
+def blackbox_funkce_1(number):
+    return math.sqrt(number)
+def blackbox_funkce_2(number):
     return number * number
+
 
 
 for number in range(1, 4):
@@ -63,7 +84,7 @@ for number in range(1, 4):
             "role": "user",
             "content": (
                 f"Rekni kratky vtip s cislem {number}. "
-                "Nejdriv pouzij tool square_number a ve vtipu pouzij vysledek."
+                "Cislo dej na druhou a ve vtipu pouzij vysledek."
             ),
         },
     ]
@@ -71,7 +92,6 @@ for number in range(1, 4):
     if DEBUG:
         print("\n[1] Posilam modelu prompt a dostupny tool:")
         print(messages[-1]["content"])
-        print("Tool:", tools[0]["function"]["name"])
 
     response = client.chat.completions.create(
         model="gpt-4o",
@@ -82,7 +102,7 @@ for number in range(1, 4):
 
     tool_call = response.choices[0].message.tool_calls[0]
     arguments = json.loads(tool_call.function.arguments)
-    square = square_number(arguments["number"])
+    square = blackbox_funkce_1(arguments["number"])
     tool_output = {
         "number": arguments["number"],
         "square": square,
@@ -93,8 +113,8 @@ for number in range(1, 4):
         print("Tool call ID:", tool_call.id)
         print("Nazev toolu:", tool_call.function.name)
         print("Argumenty od modelu:", tool_call.function.arguments)
-        print("\n[3] Python spustil lokalni funkci:")
-        print(f"square_number({arguments['number']}) -> {square}")
+        print("\n[3] Python spustil lokalni funkci.")
+
 
     messages.append(
         {
