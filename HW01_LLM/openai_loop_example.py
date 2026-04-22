@@ -27,6 +27,16 @@ client = OpenAI(
 
 DEBUG = True
 
+tool_skill = """
+Simulovany skill: znalost blackbox toolu.
+
+- blackbox_funkce_1 vraci odmocninu cisla.
+- blackbox_funkce_2 vraci druhou mocninu cisla.
+
+Kdyz uzivatel chce cislo na druhou, pouzij blackbox_funkce_2.
+Kdyz uzivatel chce odmocninu, pouzij blackbox_funkce_1.
+"""
+
 
 tools = [
     {
@@ -78,7 +88,7 @@ for number in range(1, 4):
     messages = [
         {
             "role": "developer",
-            "content": "Odpovidej cesky, strucne a slusne.",
+            "content": "Odpovidej cesky, strucne a slusne.\n" + tool_skill,
         },
         {
             "role": "user",
@@ -91,6 +101,7 @@ for number in range(1, 4):
 
     if DEBUG:
         print("\n[1] Posilam modelu prompt a dostupny tool:")
+        print("Developer message obsahuje simulovany skill.")
         print(messages[-1]["content"])
 
     response = client.chat.completions.create(
