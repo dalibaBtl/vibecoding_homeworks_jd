@@ -102,10 +102,17 @@ for number in range(1, 4):
 
     tool_call = response.choices[0].message.tool_calls[0]
     arguments = json.loads(tool_call.function.arguments)
-    square = blackbox_funkce_1(arguments["number"])
+
+    if tool_call.function.name == "blackbox_funkce_1":
+        result = blackbox_funkce_1(arguments["number"])
+    elif tool_call.function.name == "blackbox_funkce_2":
+        result = blackbox_funkce_2(arguments["number"])
+    else:
+        raise ValueError(f"Neznamy tool: {tool_call.function.name}")
+
     tool_output = {
         "number": arguments["number"],
-        "square": square,
+        "result": result,
     }
 
     if DEBUG:
@@ -113,7 +120,8 @@ for number in range(1, 4):
         print("Tool call ID:", tool_call.id)
         print("Nazev toolu:", tool_call.function.name)
         print("Argumenty od modelu:", tool_call.function.arguments)
-        print("\n[3] Python spustil lokalni funkci.")
+        print("\n[3] Python spustil lokalni funkci:")
+        print(f"{tool_call.function.name}({arguments['number']}) -> {result}")
 
 
     messages.append(
@@ -152,5 +160,5 @@ for number in range(1, 4):
     joke = final_response.choices[0].message.content
 
     print("\n[5] Finalni odpoved modelu:")
-    print(f"--- Vtip cislo {number}: {number}^2 = {square} ---")
+    print(f"--- Vtip cislo {number}: vysledek toolu = {result} ---")
     print(joke)
