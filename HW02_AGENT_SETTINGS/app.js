@@ -237,11 +237,18 @@ function buildBrokenLibraryItem(src, label, err) {
 // Symbol placement / rendering
 // --------------------------------------------------------------------------
 
-function placeSymbol(src, x, y) {
+/**
+ * Place a symbol at an exact top-left coordinate with a caller-supplied id.
+ * Used by both drag-drop placement (via :func:`placeSymbol`) and JSON import.
+ *
+ * Coordinates are snapped to the grid. If the requested id is already in
+ * use, the function returns false and does nothing — callers must dedupe.
+ */
+function instantiateSymbol(id, src, x, y) {
+  if (state.symbols.has(id)) return false;
   const def = loadSymbol(src);
-  const id = `s${state.nextSymId++}`;
-  const sx = snap(x - def.w / 2);
-  const sy = snap(y - def.h / 2);
+  const sx = snap(x);
+  const sy = snap(y);
 
   const pinsByName = new Map(def.pins.map((p) => [p.name, { cx: p.cx, cy: p.cy }]));
   state.symbols.set(id, { src, x: sx, y: sy, w: def.w, h: def.h, pinsByName });
@@ -271,7 +278,20 @@ function placeSymbol(src, x, y) {
   }
 
   layerSymbols.appendChild(g);
-  setStatus(`Placed ${src.split("/").pop()} at (${sx}, ${sy})`);
+  return true;
+}
+
+/**
+ * Place a symbol centered on a drop coordinate, generating a fresh id.
+ * Thin wrapper around :func:`instantiateSymbol`.
+ */
+function placeSymbol(src, x, y) {
+  const def = loadSymbol(src);
+  const id = `s${state.nextSymId++}`;
+  const sx = x - def.w / 2;
+  const sy = y - def.h / 2;
+  instantiateSymbol(id, src, sx, sy);
+  setStatus(`Placed ${src.split("/").pop()} at (${snap(sx)}, ${snap(sy)})`);
 }
 
 function moveSymbol(id, x, y) {
@@ -553,7 +573,7 @@ document.getElementById("export-btn").addEventListener("click", () => {
       x: s.x,
       y: s.y,
     })),
-    wires: state.wires.map((w) => ({ from: w.from, to: w.to })),
+    wires: state.wires.map((w) => ({ id: w.id, from: w.from, to: w.to })),
   };
   const json = JSON.stringify(data, null, 2);
   const blob = new Blob([json], { type: "application/json" });
@@ -571,12 +591,137 @@ document.getElementById("export-btn").addEventListener("click", () => {
 document.getElementById("clear-btn").addEventListener("click", () => {
   if (state.symbols.size === 0 && state.wires.length === 0) return;
   if (!confirm("Clear the entire schematic?")) return;
+  clearSchematic();
+  setStatus("Cleared");
+});
+
+/**
+ * Drop every symbol and wire without prompting. Used by Clear (after confirm)
+ * and by Import (which replaces the current schematic with the loaded one).
+ */
+function clearSchematic() {
   for (const id of [...state.symbols.keys()]) deleteSymbol(id);
+  state.symbols.clear();
   state.wires = [];
   state.selection = null;
   cancelWire();
-  setStatus("Cleared");
+}
+
+// --- Import ---------------------------------------------------------------
+
+const importBtn = document.getElementById("import-btn");
+const importFile = document.getElementById("import-file");
+
+importBtn.addEventListener("click", () => {
+  // Reset the input so the same file twice in a row still fires `change`.
+  importFile.value = "";
+  importFile.click();
 });
+
+importFile.addEventListener("change", async (e) => {
+  const file = e.target.files && e.target.files[0];
+  if (!file) return;
+  try {
+    const text = await file.text();
+    const data = JSON.parse(text);
+    const summary = importSchematic(data);
+    setStatus(
+      `Imported ${summary.symbols} symbols, ${summary.wires} wires` +
+        (summary.warnings.length ? ` (${summary.warnings.length} warning${summary.warnings.length === 1 ? "" : "s"} — see console)` : ""),
+    );
+    if (summary.warnings.length) {
+      console.warn("Import warnings:", summary.warnings);
+    }
+  } catch (err) {
+    console.error("Import failed:", err);
+    setStatus(`Import failed: ${err.message}`);
+  }
+});
+
+/**
+ * Replace the current schematic with one parsed from the export schema:
+ *   { symbols: [{id, src, x, y}], wires: [{from:[symId,pin], to:[symId,pin]}] }
+ *
+ * Symbols whose `src` is not in the bundle are skipped (warned). Wires
+ * referencing missing symbols or pins are skipped (warned). Original ids
+ * are preserved so subsequent re-exports stay diff-friendly; `nextSymId`
+ * and `nextWireId` are advanced past any numeric suffixes encountered.
+ *
+ * @returns {{symbols:number, wires:number, warnings:string[]}}
+ */
+function importSchematic(data) {
+  const warnings = [];
+  if (!data || typeof data !== "object") {
+    throw new Error("not an object");
+  }
+  const symbols = Array.isArray(data.symbols) ? data.symbols : [];
+  const wires = Array.isArray(data.wires) ? data.wires : [];
+
+  clearSchematic();
+
+  let maxSymN = 0;
+  let placed = 0;
+  for (const s of symbols) {
+    if (!s || typeof s.id !== "string" || typeof s.src !== "string"
+        || typeof s.x !== "number" || typeof s.y !== "number") {
+      warnings.push(`malformed symbol entry: ${JSON.stringify(s)}`);
+      continue;
+    }
+    if (!(window.SYMBOLS && window.SYMBOLS.files && window.SYMBOLS.files[s.src])) {
+      warnings.push(`symbol src not in bundle, skipping: ${s.src} (id=${s.id})`);
+      continue;
+    }
+    if (state.symbols.has(s.id)) {
+      warnings.push(`duplicate symbol id in file: ${s.id}`);
+      continue;
+    }
+    try {
+      instantiateSymbol(s.id, s.src, s.x, s.y);
+      placed++;
+    } catch (err) {
+      warnings.push(`failed to instantiate ${s.id} (${s.src}): ${err.message}`);
+      continue;
+    }
+    const m = /^s(\d+)$/.exec(s.id);
+    if (m) maxSymN = Math.max(maxSymN, parseInt(m[1], 10));
+  }
+  state.nextSymId = maxSymN + 1;
+
+  let maxWireN = 0;
+  let wired = 0;
+  for (const w of wires) {
+    if (!w || !Array.isArray(w.from) || !Array.isArray(w.to)
+        || w.from.length !== 2 || w.to.length !== 2) {
+      warnings.push(`malformed wire entry: ${JSON.stringify(w)}`);
+      continue;
+    }
+    const [fromSym, fromPin] = w.from;
+    const [toSym, toPin] = w.to;
+    if (!state.symbols.has(fromSym) || !state.symbols.has(toSym)) {
+      warnings.push(`wire references missing symbol: ${fromSym} → ${toSym}`);
+      continue;
+    }
+    if (!state.symbols.get(fromSym).pinsByName.has(fromPin)
+        || !state.symbols.get(toSym).pinsByName.has(toPin)) {
+      warnings.push(`wire references missing pin: ${fromSym}/${fromPin} → ${toSym}/${toPin}`);
+      continue;
+    }
+    const id = typeof w.id === "string" && w.id ? w.id : `w${state.nextWireId++}`;
+    const wire = { id, from: [fromSym, fromPin], to: [toSym, toPin] };
+    state.wires.push(wire);
+    const path = document.createElementNS(SVG_NS, "path");
+    path.setAttribute("class", "wire");
+    path.setAttribute("data-wire-id", id);
+    layerWires.appendChild(path);
+    updateWirePath(wire);
+    wired++;
+    const m = /^w(\d+)$/.exec(id);
+    if (m) maxWireN = Math.max(maxWireN, parseInt(m[1], 10));
+  }
+  state.nextWireId = Math.max(state.nextWireId, maxWireN + 1);
+
+  return { symbols: placed, wires: wired, warnings };
+}
 
 // --------------------------------------------------------------------------
 // Boot

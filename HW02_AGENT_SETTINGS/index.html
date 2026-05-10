@@ -3,7 +3,10 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Schematic editor</title>
+  <title>BITLAGO — Schematic editor</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="app.css">
 </head>
 <body>
@@ -11,8 +14,10 @@
     <h1 class="toolbar-title">Schematic editor</h1>
     <div class="toolbar-actions">
       <span class="toolbar-hint" id="hint">Drag a symbol from the library onto the canvas. Click a pin, then another pin, to draw a wire.</span>
+      <button id="import-btn" class="btn" type="button">Import JSON</button>
       <button id="export-btn" class="btn btn-primary" type="button">Export JSON</button>
       <button id="clear-btn" class="btn" type="button">Clear</button>
+      <input id="import-file" type="file" accept="application/json,.json" hidden>
     </div>
   </header>
 

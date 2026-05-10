@@ -72,7 +72,7 @@ Symbols live in `symbols/<category>/<name>.svg`. The `inspect_symbol` MCP tool i
 - Editor opens via `file://` directly. Symbol data is inlined into `bundle.js` as `window.SYMBOLS = {manifest, files}` — the editor never calls `fetch()`, which would be blocked over `file://`.
 - After adding/removing/renaming a symbol, regenerate the bundle by calling `mcp__symbol-pin-inspector__bundle_library` (no args needed — it walks `symbols/`).
 - Canvas snaps drops to the **10 px grid**; wire endpoints clamp the same way.
-- Schematics serialize to JSON: `{symbols: [{id, src, x, y}], wires: [{from: [symId,pin], to: [symId,pin]}]}`.
+- Schematics serialize to JSON: `{symbols: [{id, src, x, y}], wires: [{id, from: [symId,pin], to: [symId,pin]}]}`. Round-trip (export → import → export) is diff-stable: IDs are preserved on import and re-emitted on export.
 
 ## How to verify the setup (after first restart of Claude Code in this folder)
 
