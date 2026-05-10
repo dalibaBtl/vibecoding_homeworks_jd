@@ -1,0 +1,237 @@
+/*
+ * Schematic editor — base stylesheet.
+ *
+ * All visual choices are exposed as CSS custom properties on :root so the
+ * `btl101-styling` skill can repaint the editor without touching markup or
+ * structural rules. Layout, behavior, and component anatomy live here.
+ */
+
+:root {
+  --bg: #ffffff;
+  --fg: #111827;
+  --muted: #6b7280;
+  --border: #e5e7eb;
+  --surface: #f9fafb;
+  --surface-hover: #f3f4f6;
+
+  --accent: #2563eb;
+  --accent-fg: #ffffff;
+  --accent-soft: #dbeafe;
+
+  --grid-minor: #eef2f7;
+  --grid-major: #dde3ec;
+
+  --pin-fill: #2563eb;
+  --pin-active: #f59e0b;
+  --wire: #111827;
+  --wire-preview: #2563eb;
+  --selection: #2563eb;
+
+  --radius: 6px;
+  --shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+
+  --font: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  font-family: var(--font);
+  font-size: 14px;
+  color: var(--fg);
+  background: var(--bg);
+}
+
+/* --- toolbar ------------------------------------------------------------ */
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0 1rem;
+  height: 48px;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg);
+}
+
+.toolbar-title {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.toolbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.toolbar-hint {
+  color: var(--muted);
+  font-size: 0.8rem;
+}
+
+.btn {
+  font: inherit;
+  font-size: 0.85rem;
+  padding: 0.4rem 0.8rem;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--fg);
+  cursor: pointer;
+  box-shadow: var(--shadow);
+}
+.btn:hover { background: var(--surface-hover); }
+.btn-primary {
+  background: var(--accent);
+  color: var(--accent-fg);
+  border-color: var(--accent);
+}
+.btn-primary:hover { filter: brightness(0.95); background: var(--accent); }
+
+/* --- layout ------------------------------------------------------------- */
+
+.layout {
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  height: calc(100% - 48px);
+  min-height: 0;
+}
+
+/* --- library sidebar ---------------------------------------------------- */
+
+.library {
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  overflow-y: auto;
+  padding: 0.5rem 0.25rem 1rem;
+}
+.library-section + .library-section { margin-top: 0.5rem; }
+.library-section h2 {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+  margin: 0.75rem 0.75rem 0.25rem;
+  font-weight: 600;
+}
+.library-item {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.4rem 0.5rem;
+  margin: 0 0.25rem;
+  border-radius: var(--radius);
+  cursor: grab;
+  user-select: none;
+}
+.library-item:hover { background: var(--surface-hover); }
+.library-item:active { cursor: grabbing; }
+.library-thumb {
+  width: 40px;
+  height: 40px;
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+}
+.library-thumb svg,
+.library-thumb-img {
+  width: 32px;
+  height: 32px;
+  display: block;
+  object-fit: contain;
+}
+.library-thumb-broken {
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: 1rem;
+  font-weight: 700;
+}
+.library-item-broken { opacity: 0.5; cursor: not-allowed; }
+.library-label {
+  font-size: 0.85rem;
+  line-height: 1.2;
+}
+
+/* --- canvas ------------------------------------------------------------- */
+
+.canvas-wrap {
+  position: relative;
+  overflow: auto;
+  background: var(--bg);
+  min-width: 0;
+  min-height: 0;
+}
+#canvas {
+  display: block;
+  width: 1600px;
+  height: 1000px;
+}
+#canvas:focus { outline: none; }
+
+/* placed symbols */
+.placed { cursor: move; }
+.placed-hit {
+  /* invisible bounding rect that captures drag events on the symbol body */
+  fill: transparent;
+  stroke: none;
+  pointer-events: all;
+}
+.placed.selected .placed-hit {
+  stroke: var(--selection);
+  stroke-width: 1;
+  stroke-dasharray: 3 3;
+}
+
+/* pins */
+.pin {
+  fill: var(--pin-fill);
+  stroke: none;
+  cursor: crosshair;
+  transition: r 80ms ease-out;
+}
+.pin:hover { fill: var(--pin-active); }
+.pin.armed { fill: var(--pin-active); }
+
+/* wires */
+.wire {
+  stroke: var(--wire);
+  stroke-width: 1.5;
+  fill: none;
+  pointer-events: stroke;
+  cursor: pointer;
+}
+.wire.selected { stroke: var(--selection); }
+.wire-preview {
+  stroke: var(--wire-preview);
+  stroke-width: 1.5;
+  stroke-dasharray: 5 3;
+  fill: none;
+  pointer-events: none;
+}
+
+/* status bar */
+.status {
+  position: absolute;
+  left: 0.5rem;
+  bottom: 0.5rem;
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  color: var(--muted);
+  background: rgba(255, 255, 255, 0.85);
+  padding: 0.25rem 0.5rem;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  pointer-events: none;
+  backdrop-filter: blur(2px);
+}

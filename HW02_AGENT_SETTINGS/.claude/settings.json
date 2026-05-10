@@ -3,6 +3,7 @@
   "permissions": {
     "allow": [
       "mcp__symbol-pin-inspector__inspect_symbol",
+      "mcp__symbol-pin-inspector__bundle_library",
 
       "mcp__btl101-fs__read_text_file",
       "mcp__btl101-fs__read_multiple_files",

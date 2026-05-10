@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Schematic editor</title>
+  <link rel="stylesheet" href="app.css">
+</head>
+<body>
+  <header class="toolbar">
+    <h1 class="toolbar-title">Schematic editor</h1>
+    <div class="toolbar-actions">
+      <span class="toolbar-hint" id="hint">Drag a symbol from the library onto the canvas. Click a pin, then another pin, to draw a wire.</span>
+      <button id="export-btn" class="btn btn-primary" type="button">Export JSON</button>
+      <button id="clear-btn" class="btn" type="button">Clear</button>
+    </div>
+  </header>
+
+  <main class="layout">
+    <aside class="library" id="library" aria-label="Symbol library"></aside>
+
+    <section class="canvas-wrap">
+      <svg id="canvas" xmlns="http://www.w3.org/2000/svg"
+           viewBox="0 0 1600 1000" preserveAspectRatio="xMinYMin meet"
+           tabindex="0" aria-label="Schematic canvas">
+        <defs>
+          <pattern id="grid-minor" width="10" height="10" patternUnits="userSpaceOnUse">
+            <path d="M 10 0 L 0 0 0 10" fill="none" stroke="var(--grid-minor)" stroke-width="0.5"/>
+          </pattern>
+          <pattern id="grid-major" width="100" height="100" patternUnits="userSpaceOnUse">
+            <rect width="100" height="100" fill="url(#grid-minor)"/>
+            <path d="M 100 0 L 0 0 0 100" fill="none" stroke="var(--grid-major)" stroke-width="1"/>
+          </pattern>
+        </defs>
+        <rect id="canvas-bg" width="100%" height="100%" fill="url(#grid-major)"/>
+        <g id="layer-wires"></g>
+        <g id="layer-symbols"></g>
+        <g id="layer-overlay"></g>
+      </svg>
+      <div class="status" id="status" aria-live="polite">Ready</div>
+    </section>
+  </main>
+
+  <script src="symbols/bundle.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

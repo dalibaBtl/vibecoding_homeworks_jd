@@ -20,8 +20,8 @@ HW02_AGENT_SETTINGS/
 │   ├── pyproject.toml
 │   ├── src/symbol_pin_inspector/
 │   │   ├── __init__.py
-│   │   └── server.py                  # FastMCP server, one tool: inspect_symbol
-│   └── tests/smoke.py                 # four-case validator smoke test
+│   │   └── server.py                  # FastMCP server: inspect_symbol + bundle_library
+│   └── tests/smoke.py                 # smoke tests for both tools
 ├── refs/                              # PDF references for the subagent to read
 │   └── toaz.info-iec-60617-symbols-...-2.pdf
 ├── symbols/                           # generated SVGs (subagent writes here)
@@ -52,7 +52,9 @@ Both are stdio servers, project-scoped via `.mcp.json`. Settings opt them in wit
 
 - Built with the `mcp` Python SDK (`FastMCP`).
 - Launched via `uv --directory symbol_pin_inspector_mcp run symbol-pin-inspector`.
-- One tool: `mcp__symbol-pin-inspector__inspect_symbol(svg_path)` → `{pins, errors, grid, ok}`.
+- Two tools:
+  - `mcp__symbol-pin-inspector__inspect_symbol(svg_path)` → `{pins, errors, grid, ok}` — validates a single SVG. Used by the `symbol-author` subagent after every write.
+  - `mcp__symbol-pin-inspector__bundle_library(symbols_dir?, output_path?, soft_validate?)` → `{ok, output, size_bytes, categories, included, skipped, errors}` — walks `symbols/<category>/*.svg`, soft-validates each, derives a label from `<title>` or filename, and writes `symbols/bundle.js` (the editor's `window.SYMBOLS` blob). Replaces the old hand-maintained `manifest.json` + `tools/bundle.py` pair — the discovery walk is the source of truth.
 
 ### `btl101-fs` (off-the-shelf, npx)
 
@@ -66,8 +68,9 @@ Symbols live in `symbols/<category>/<name>.svg`. The `inspect_symbol` MCP tool i
 
 ## Editor convention
 
-- Single `index.html` + `app.css` + `app.js`. **No build step.**
-- Symbols are loaded by relative URL from `symbols/`.
+- Single `index.html` + `app.css` + `app.js` + generated `symbols/bundle.js`. **No build step, no server.**
+- Editor opens via `file://` directly. Symbol data is inlined into `bundle.js` as `window.SYMBOLS = {manifest, files}` — the editor never calls `fetch()`, which would be blocked over `file://`.
+- After adding/removing/renaming a symbol, regenerate the bundle by calling `mcp__symbol-pin-inspector__bundle_library` (no args needed — it walks `symbols/`).
 - Canvas snaps drops to the **10 px grid**; wire endpoints clamp the same way.
 - Schematics serialize to JSON: `{symbols: [{id, src, x, y}], wires: [{from: [symId,pin], to: [symId,pin]}]}`.
 
