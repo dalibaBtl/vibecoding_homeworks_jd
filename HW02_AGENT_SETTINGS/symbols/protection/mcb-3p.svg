@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 60">
+  <!-- Pole L1 (pins 1 top / 2 bottom) -->
+  <line x1="20" y1="0"  x2="20" y2="20" stroke="black" stroke-width="1.5"/>
+  <line x1="20" y1="20" x2="28" y2="34" stroke="black" stroke-width="1.5"/>
+  <line x1="20" y1="40" x2="20" y2="60" stroke="black" stroke-width="1.5"/>
+  <rect x="22" y="23" width="4" height="4" fill="black" stroke="black" stroke-width="1"/>
+
+  <!-- Pole L2 (pins 3 top / 4 bottom) -->
+  <line x1="40" y1="0"  x2="40" y2="20" stroke="black" stroke-width="1.5"/>
+  <line x1="40" y1="20" x2="48" y2="34" stroke="black" stroke-width="1.5"/>
+  <line x1="40" y1="40" x2="40" y2="60" stroke="black" stroke-width="1.5"/>
+  <rect x="42" y="23" width="4" height="4" fill="black" stroke="black" stroke-width="1"/>
+
+  <!-- Pole L3 (pins 5 top / 6 bottom) -->
+  <line x1="60" y1="0"  x2="60" y2="20" stroke="black" stroke-width="1.5"/>
+  <line x1="60" y1="20" x2="68" y2="34" stroke="black" stroke-width="1.5"/>
+  <line x1="60" y1="40" x2="60" y2="60" stroke="black" stroke-width="1.5"/>
+  <rect x="62" y="23" width="4" height="4" fill="black" stroke="black" stroke-width="1"/>
+
+  <!-- Mechanical link: dashed line through the three moving contacts -->
+  <line x1="28" y1="34" x2="68" y2="34"
+        stroke="black" stroke-width="1.5" stroke-dasharray="3,2" fill="none"/>
+
+  <!-- Connection pins -->
+  <circle class="pin" data-pin="1" cx="20" cy="0"  r="2"/>
+  <circle class="pin" data-pin="3" cx="40" cy="0"  r="2"/>
+  <circle class="pin" data-pin="5" cx="60" cy="0"  r="2"/>
+  <circle class="pin" data-pin="2" cx="20" cy="60" r="2"/>
+  <circle class="pin" data-pin="4" cx="40" cy="60" r="2"/>
+  <circle class="pin" data-pin="6" cx="60" cy="60" r="2"/>
+</svg>

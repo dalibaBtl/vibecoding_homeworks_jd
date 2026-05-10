@@ -1,0 +1,24 @@
+{
+  "$schema": "https://raw.githubusercontent.com/anthropics/claude-code/main/schemas/mcp.json",
+  "mcpServers": {
+    "symbol-pin-inspector": {
+      "type": "stdio",
+      "command": "uv",
+      "args": [
+        "--directory",
+        "symbol_pin_inspector_mcp",
+        "run",
+        "symbol-pin-inspector"
+      ]
+    },
+    "btl101-fs": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-filesystem",
+        "/home/jandaliba/dev/BTL101"
+      ]
+    }
+  }
+}

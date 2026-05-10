@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 80">
+  <line x1="10" y1="0"  x2="10" y2="20" stroke="black" stroke-width="1.5"/>
+  <line x1="30" y1="0"  x2="30" y2="20" stroke="black" stroke-width="1.5"/>
+  <line x1="50" y1="0"  x2="50" y2="20" stroke="black" stroke-width="1.5"/>
+  <line x1="10" y1="20" x2="50" y2="20" stroke="black" stroke-width="1.5"/>
+  <line x1="30" y1="20" x2="30" y2="35" stroke="black" stroke-width="1.5"/>
+  <circle cx="30" cy="55" r="20" fill="none" stroke="black" stroke-width="1.5"/>
+  <text x="30" y="50" font-family="sans-serif" font-size="10" font-weight="bold"
+        text-anchor="middle" dominant-baseline="central">M</text>
+  <text x="30" y="63" font-family="sans-serif" font-size="8"
+        text-anchor="middle" dominant-baseline="central">3~</text>
+  <circle class="pin" data-pin="U1" cx="10" cy="0" r="2"/>
+  <circle class="pin" data-pin="V1" cx="30" cy="0" r="2"/>
+  <circle class="pin" data-pin="W1" cx="50" cy="0" r="2"/>
+</svg>

@@ -1,0 +1,374 @@
+/*
+ * Schematic editor — BTL101-themed stylesheet.
+ *
+ * Tokens at the top of :root mirror the variables declared in
+ * /home/jandaliba/dev/BTL101/_WEB/index.html (the canonical Bitlago design
+ * source). Every editor-specific rule below consumes them so palette /
+ * typography changes propagate from one place. Component anatomy and
+ * structural rules (layout grid, pin hit-targets, wire styling) are
+ * unchanged from the base build — they don't depend on the colour story.
+ */
+
+:root {
+  /* ── BTL101 design tokens (do not redefine values below; consume only) ── */
+  --btl-bg: #0a0e17;
+  --btl-surface: #111827;
+  --btl-accent: #00d4ff;
+  --btl-accent-2: #7c3aed;
+  --btl-accent-3: #10b981;
+  --btl-warn: #f59e0b;
+  --btl-pink: #d73cbe;
+  --btl-muted: #9ca3af;
+  --btl-text: #e5e7eb;
+
+  --btl-border: rgba(255, 255, 255, 0.06);
+  --btl-border-strong: rgba(255, 255, 255, 0.12);
+  --btl-surface-translucent: rgba(17, 24, 39, 0.7);
+  --btl-accent-glow: rgba(0, 212, 255, 0.35);
+  --btl-accent-tint: rgba(0, 212, 255, 0.06);
+
+  --btl-mono: "Space Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  --btl-sans: "DM Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+
+  --btl-radius: 10px;
+  --btl-radius-sm: 6px;
+
+  /* ── Editor-internal aliases (semantic, used by the component rules) ── */
+  --bg: var(--btl-bg);
+  --fg: var(--btl-text);
+  --muted: var(--btl-muted);
+  --border: var(--btl-border);
+  --surface: var(--btl-surface);
+  --surface-hover: rgba(255, 255, 255, 0.04);
+
+  --accent: var(--btl-accent);
+  --accent-fg: var(--btl-bg);
+  --accent-soft: var(--btl-accent-tint);
+
+  --grid-minor: rgba(0, 212, 255, 0.05);
+  --grid-major: rgba(0, 212, 255, 0.12);
+
+  --pin-fill: var(--btl-accent);
+  --pin-active: var(--btl-warn);
+  --wire: var(--btl-text);
+  --wire-preview: var(--btl-accent);
+  --selection: var(--btl-accent);
+
+  --radius: var(--btl-radius);
+  --shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow-elev: 0 20px 48px -20px var(--btl-accent-glow);
+
+  --font: var(--btl-sans);
+  --mono: var(--btl-mono);
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  font-family: var(--font);
+  font-size: 14px;
+  color: var(--fg);
+  background:
+    radial-gradient(circle at 18% 6%, rgba(0, 212, 255, 0.08), transparent 38%),
+    radial-gradient(circle at 92% 92%, rgba(124, 58, 237, 0.10), transparent 42%),
+    var(--bg);
+  background-attachment: fixed;
+  -webkit-font-smoothing: antialiased;
+  overflow: hidden;
+}
+
+/* --- toolbar (BTL101 top-nav idiom) ------------------------------------- */
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0 clamp(16px, 2vw, 28px);
+  height: 56px;
+  background: rgba(10, 14, 23, 0.72);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--border);
+  position: relative;
+  z-index: 10;
+}
+
+.toolbar-title {
+  margin: 0;
+  font-family: var(--mono);
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  background: linear-gradient(120deg, #ffffff 0%, #a5f3fc 45%, #c4b5fd 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.toolbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.toolbar-hint {
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.btn {
+  font: inherit;
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  padding: 0.55rem 1rem;
+  border-radius: var(--radius-sm, 6px);
+  border: 1px solid var(--btl-border-strong);
+  background: rgba(255, 255, 255, 0.02);
+  color: var(--fg);
+  cursor: pointer;
+  transition:
+    transform 0.18s ease,
+    color 0.18s ease,
+    border-color 0.18s ease,
+    background 0.18s ease,
+    box-shadow 0.18s ease;
+}
+.btn:hover {
+  color: var(--accent);
+  border-color: rgba(0, 212, 255, 0.45);
+  background: var(--accent-soft);
+  transform: translateY(-1px);
+}
+.btn-primary {
+  background: var(--accent);
+  color: var(--accent-fg);
+  border-color: var(--accent);
+  box-shadow: 0 0 0 1px rgba(0, 212, 255, 0.15);
+}
+.btn-primary:hover {
+  color: var(--accent-fg);
+  background: var(--accent);
+  border-color: var(--accent);
+  filter: brightness(1.08);
+  box-shadow: 0 12px 32px -12px var(--btl-accent-glow);
+}
+
+/* --- layout ------------------------------------------------------------- */
+
+.layout {
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  height: calc(100% - 56px);
+  min-height: 0;
+  position: relative;
+  z-index: 1;
+}
+
+/* --- library sidebar ---------------------------------------------------- */
+
+.library {
+  background: rgba(17, 24, 39, 0.55);
+  border-right: 1px solid var(--border);
+  overflow-y: auto;
+  padding: 0.75rem 0.5rem 1.5rem;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.library-section + .library-section { margin-top: 0.75rem; }
+
+.library-section h2 {
+  font-family: var(--mono);
+  font-size: 0.66rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  color: var(--accent);
+  margin: 1rem 0.75rem 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+}
+.library-section h2::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--btl-border);
+}
+
+.library-item {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 0.5rem 0.6rem;
+  margin: 0.15rem 0.25rem;
+  border-radius: var(--radius-sm, 6px);
+  border: 1px solid transparent;
+  border-left: 3px solid transparent;
+  cursor: grab;
+  user-select: none;
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease,
+    transform 0.15s ease;
+}
+.library-item:hover {
+  background: var(--surface-hover);
+  border-color: rgba(0, 212, 255, 0.18);
+  border-left-color: var(--accent);
+  transform: translateX(1px);
+}
+.library-item:active { cursor: grabbing; }
+
+.library-thumb {
+  width: 44px;
+  height: 44px;
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm, 6px);
+}
+.library-thumb svg,
+.library-thumb-img {
+  width: 32px;
+  height: 32px;
+  display: block;
+  object-fit: contain;
+  /* SVGs were drawn with stroke="black"; invert them on the dark theme so
+     they read as light strokes on the deep-blue panel. */
+  filter: invert(1) hue-rotate(180deg);
+}
+.library-thumb-broken {
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: 1rem;
+  font-weight: 700;
+  filter: none;
+}
+.library-item-broken {
+  opacity: 0.5;
+  cursor: not-allowed;
+  border-left-color: var(--btl-warn);
+}
+
+.library-label {
+  font-family: var(--mono);
+  font-size: 0.78rem;
+  letter-spacing: 0.02em;
+  color: var(--fg);
+  line-height: 1.2;
+}
+
+/* --- canvas ------------------------------------------------------------- */
+
+.canvas-wrap {
+  position: relative;
+  overflow: auto;
+  background:
+    radial-gradient(circle at 65% 30%, rgba(0, 212, 255, 0.04), transparent 55%),
+    var(--surface);
+  min-width: 0;
+  min-height: 0;
+}
+#canvas {
+  display: block;
+  width: 1600px;
+  height: 1000px;
+}
+#canvas:focus { outline: none; }
+
+/* placed symbols. The original SVGs use stroke="black"; we recolor them via
+   a CSS filter to match the dark BTL101 theme so they appear as light cyan-
+   tinted strokes on the dark surface. */
+.placed { cursor: move; }
+.placed > :not(.placed-hit) {
+  filter: invert(1) hue-rotate(180deg) saturate(0.4) brightness(1.05);
+}
+.placed-hit {
+  fill: transparent;
+  stroke: none;
+  pointer-events: all;
+}
+.placed.selected .placed-hit {
+  stroke: var(--selection);
+  stroke-width: 1;
+  stroke-dasharray: 3 3;
+  filter: drop-shadow(0 0 4px var(--btl-accent-glow));
+}
+
+/* pins are not part of the symbol drawing; render them in our accent palette
+   directly so they always read as interactive affordances. */
+.pin {
+  fill: var(--pin-fill);
+  stroke: none;
+  cursor: crosshair;
+  transition: r 80ms ease-out, fill 80ms ease-out;
+  filter: drop-shadow(0 0 2px rgba(0, 212, 255, 0.55));
+}
+.placed .pin { filter: drop-shadow(0 0 2px rgba(0, 212, 255, 0.55)); }
+.pin:hover { fill: var(--pin-active); }
+.pin.armed { fill: var(--pin-active); }
+
+/* wires */
+.wire {
+  stroke: var(--wire);
+  stroke-width: 1.5;
+  fill: none;
+  pointer-events: stroke;
+  cursor: pointer;
+}
+.wire.selected {
+  stroke: var(--selection);
+  filter: drop-shadow(0 0 3px var(--btl-accent-glow));
+}
+.wire-preview {
+  stroke: var(--wire-preview);
+  stroke-width: 1.5;
+  stroke-dasharray: 5 3;
+  fill: none;
+  pointer-events: none;
+  filter: drop-shadow(0 0 3px var(--btl-accent-glow));
+}
+
+/* status bar — BTL101 hero-meta cell idiom */
+.status {
+  position: absolute;
+  left: 12px;
+  bottom: 12px;
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.06em;
+  color: var(--accent);
+  background: var(--btl-surface-translucent);
+  padding: 0.4rem 0.7rem;
+  border: 1px solid var(--border);
+  border-left: 2px solid var(--accent);
+  border-radius: var(--radius-sm, 6px);
+  pointer-events: none;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+/* --- scrollbar (subtle, matches the dark palette) ----------------------- */
+
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 999px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+::-webkit-scrollbar-thumb:hover { background: rgba(0, 212, 255, 0.2); background-clip: padding-box; }

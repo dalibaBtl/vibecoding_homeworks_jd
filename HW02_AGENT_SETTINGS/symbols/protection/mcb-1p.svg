@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 60">
+  <!-- Top lead: line terminal "1" down to upper fixed contact -->
+  <line x1="20" y1="0"  x2="20" y2="20" stroke="black" stroke-width="1.5"/>
+  <!-- Bottom lead: lower pivot down to load terminal "2" -->
+  <line x1="20" y1="40" x2="20" y2="60" stroke="black" stroke-width="1.5"/>
+  <!-- Moving contact (make-contact, shown open): pivot at (20,40), tip up-right -->
+  <line x1="20" y1="40" x2="32" y2="22" stroke="black" stroke-width="1.5"/>
+  <!-- Circuit-breaker function glyph: small "x" near the moving-contact tip -->
+  <line x1="28" y1="14" x2="34" y2="20" stroke="black" stroke-width="1.5"/>
+  <line x1="34" y1="14" x2="28" y2="20" stroke="black" stroke-width="1.5"/>
+  <!-- Pins -->
+  <circle class="pin" data-pin="1" cx="20" cy="0"  r="2" fill="none" stroke="black" stroke-width="1.5"/>
+  <circle class="pin" data-pin="2" cx="20" cy="60" r="2" fill="none" stroke="black" stroke-width="1.5"/>
+</svg>
