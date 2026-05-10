@@ -1,0 +1,24 @@
+{
+  "enableAllProjectMcpServers": true,
+  "permissions": {
+    "allow": [
+      "mcp__symbol-pin-inspector__inspect_symbol",
+
+      "mcp__btl101-fs__read_text_file",
+      "mcp__btl101-fs__read_multiple_files",
+      "mcp__btl101-fs__read_media_file",
+      "mcp__btl101-fs__list_directory",
+      "mcp__btl101-fs__list_directory_with_sizes",
+      "mcp__btl101-fs__directory_tree",
+      "mcp__btl101-fs__search_files",
+      "mcp__btl101-fs__get_file_info",
+      "mcp__btl101-fs__list_allowed_directories"
+    ],
+    "deny": [
+      "mcp__btl101-fs__write_file",
+      "mcp__btl101-fs__edit_file",
+      "mcp__btl101-fs__create_directory",
+      "mcp__btl101-fs__move_file"
+    ]
+  }
+}
