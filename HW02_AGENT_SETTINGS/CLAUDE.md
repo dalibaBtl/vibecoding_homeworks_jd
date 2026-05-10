@@ -60,18 +60,9 @@ Both are stdio servers, project-scoped via `.mcp.json`. Settings opt them in wit
 - Pinned to `/home/jandaliba/dev/BTL101/` (read-only — write tools are denied in `.claude/settings.json`).
 - Exposes `read_text_file`, `directory_tree`, `search_files`, etc. — used by the `btl101-styling` skill, **not** by the symbol-author subagent.
 
-## Symbol convention (invariants)
+## Symbol contract (one line)
 
-Every SVG under `symbols/` must:
-
-1. Have a `viewBox` whose width and height are multiples of **10** (the grid).
-2. Use `<circle class="pin" data-pin="<name>" cx="<n>" cy="<n>" r="2"/>` for every connection point.
-3. Place every pin's `cx` / `cy` on a multiple of 10.
-4. Give each pin a name unique within the file.
-5. Use industry-standard pin names where one exists (U1/V1/W1, A1/A2, 13/14, 1/3/5–2/4/6, PE).
-6. Stroke black, 1.5 px, fill none — unless the IEC drawing requires a fill (e.g. earth bar).
-
-The `inspect_symbol` MCP tool is the authoritative check for points 1–4. The subagent calls it after every write and retries up to 3 times.
+Symbols live in `symbols/<category>/<name>.svg`. The `inspect_symbol` MCP tool is the authoritative check for the geometry contract (10 px grid, pin circles, unique names). The full invariants and authoring conventions live in `.claude/agents/symbol-author.md` and load only when the subagent runs — do not hand-edit symbols, re-run the subagent.
 
 ## Editor convention
 
